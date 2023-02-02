@@ -23,12 +23,12 @@ model Cafe {
     city          String
     address       String
     phone         String
-    workTimeStart Int
-    workTimeEnd   Int
-    rating        Float
+    workTimeStart Int       @default(10)
+    workTimeEnd   Int       @default(22)
+    rating        Float     @default(0)
     averageCheck  Float
     cuisineType   String[]
-    reviews       String[]
+    reviews       Review[]
     images        String[]
     menuImg       String
     tags          String[]
@@ -38,6 +38,8 @@ model Cafe {
 model Review {
     id            Int       @id @default(autoincrement())
     author        Client    @relation(fields: [authorId], references: [id])
+    cafe          Cafe     @relation(fields: [cafeId], references: [id])
+    cafeId        Int
     authorId      Int
     text          String
     rating        Int
