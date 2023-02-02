@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client'
-import express from 'express'
+import express = require('express')
 
 const prisma = new PrismaClient();
 const server = express();
@@ -41,7 +41,7 @@ server.post(`/register`, async (req, res) => {
 
   server.post(`/cafe/new`, async (req, res) => {
     const { name, city, address, phone, averageCheck, cuisineType, images, menuImg, tags, rating, workTimeStart, workTimeEnd } = req.body
-    //const cuiseneArr = cuisineType.split('↕');
+
     const cafes: Cafe[] = await prisma.cafe.findMany({
         where: {
             name: name,
@@ -158,6 +158,8 @@ server.get('/cafe', async (req, res) => {
         ]
         }
     })
+
+    res.json(ans);
 })
 
   server.get('/clients', async (req, res) => {
