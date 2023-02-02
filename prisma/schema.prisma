@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://admin:ZeSfKCQgKFq3Ni02WQs9EcJshJWtG9iK@dpg-cfck8l6n6mpierpp4790-a.frankfurt-postgres.render.com:5432/raviole"
+}
+
+model Client {
+    id          Int        @id @default(autoincrement())
+    login       String     @unique
+    password    String
+    email       String     @unique
+    phone       String
+    reviews     Review[]
+    bookings    Booking[]
+}
+
+model Cafe {
+    id            Int       @id @default(autoincrement())
+    name          String    @unique
+    city          String
+    address       String
+    phone         String
+    workTimeStart Int
+    workTimeEnd   Int
+    rating        Float
+    averageCheck  Float
+    cuisineType   String[]
+    reviews       String[]
+    images        String[]
+    menuImg       String
+    tags          String[]
+    bookings      Booking[]
+}
+
+model Review {
+    id            Int       @id @default(autoincrement())
+    author        Client    @relation(fields: [authorId], references: [id])
+    authorId      Int
+    text          String
+    rating        Int
+}
+
+model Booking {
+    id            Int       @id @default(autoincrement())
+    guest         Client    @relation(fields: [guestId], references: [id])
+    cafe          Cafe      @relation(fields: [cafeId], references: [id])
+    cafeId        Int
+    guestId       Int
+    tableId       Int       @default(0)
+    createdAt     DateTime  @default(now())
+    date          DateTime
+    duration      Int
+
+}
