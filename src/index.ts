@@ -1,9 +1,14 @@
 import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client';
 import express = require('express');
+import headers from './cors';
+//import cors from 'cors';
+
 
 const prisma = new PrismaClient();
 const server = express();
 
+//server.use(cors());
+server.use(headers);
 server.use(express.json());
 
 server.post(`/register`, async (req, res) => {
@@ -181,9 +186,9 @@ server.get('/clients', async (req, res) => {
     // res.json('{"error":"login or email is not unique"}')
   })
 
-const worker = server.listen(3000, () =>
+const worker = server.listen(3003, () =>
   console.log(`
-🚀 Server ready at: http://localhost:3000
+🚀 Server ready at: http://localhost:3003
 ⭐️ Start doing some stuff`),
 )
 
