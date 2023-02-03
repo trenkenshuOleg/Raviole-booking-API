@@ -1,15 +1,18 @@
 import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client';
 import express = require('express');
 import headers from './cors';
+const path = require('path')
 //import cors from 'cors';
 
 
 const prisma = new PrismaClient();
 const server = express();
 
-//server.use(cors());
+server.use('/img', express.static(path.join(__dirname, '../img')))
 server.use(headers);
 server.use(express.json());
+
+console.log(__dirname);
 
 server.post(`/register`, async (req, res) => {
     const { login, password, email, phone } = req.body

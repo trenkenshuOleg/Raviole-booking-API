@@ -22,6 +22,7 @@ model Cafe {
     name          String    @unique
     city          String
     address       String
+    coordinates   Float[]
     phone         String
     workTimeStart Int       @default(10)
     workTimeEnd   Int       @default(22)
