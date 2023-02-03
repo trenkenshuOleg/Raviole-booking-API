@@ -21,8 +21,8 @@ server.post(`/register`, async (req, res) => {
             ]
         }
     });
-    console.log(clients);
-    console.log(req.body);
+    console.log('existing', clients);
+    console.log('req', req.body);
 
     if(clients.length === 0) {
         const result = await prisma.client.create({
@@ -48,7 +48,7 @@ server.post(`/cafe/new`, async (req, res) => {
             name: name,
         }
     });
-    console.log(cafes);
+    console.log('existing', cafes);
     const cus: string[] = cuisineType;
     const imgs: string[] = images;
     const tg: string[] = tags;
@@ -70,7 +70,7 @@ server.post(`/cafe/new`, async (req, res) => {
             workTimeEnd: workTimeEnd || undefined,
         },
         })
-        res.json(result)
+        res.json(result);
     } else {
         res.json('{"error":"login or email is already taken"}')
     }

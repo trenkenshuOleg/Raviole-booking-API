@@ -5,10 +5,10 @@ const func = async () => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            login: 'oleg',
+            login: 'oleg2',
             password: '111111',
-            email: 'ol@eg',
-            phone: '+375',
+            email: 'ol@eg2',
+            phone: '+3752',
         }),
     });
     console.log(await response.json());
