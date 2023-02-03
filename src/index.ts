@@ -39,7 +39,7 @@ server.post(`/register`, async (req, res) => {
 
   })
 
-  server.post(`/cafe/new`, async (req, res) => {
+server.post(`/cafe/new`, async (req, res) => {
     const { name, city, address, phone, averageCheck, cuisineType, images, menuImg, tags, rating, workTimeStart, workTimeEnd } = req.body
 
     const cafes: Cafe[] = await prisma.cafe.findMany({
@@ -162,7 +162,7 @@ server.get('/cafe', async (req, res) => {
     res.json(ans);
 })
 
-  server.get('/clients', async (req, res) => {
+server.get('/clients', async (req, res) => {
     const clients: Client[] = await prisma.client.findMany({
         where: {
             OR: [
@@ -180,9 +180,24 @@ server.get('/cafe', async (req, res) => {
     // res.json('{"error":"login or email is not unique"}')
   })
 
-  const worker = server.listen(3000, () =>
+const worker = server.listen(3000, () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000
 ⭐️ Start doing some stuff`),
 )
 
+const selfInvoke = () => {
+    const domain = 'https://restaurants-server.onrender.com/'
+    const paths = ['client/', '/cafe/'];
+    const ind = Math.floor(Math.random() * 2)
+    const id = Math.floor(Math.random() * 100) + 1;
+    const url = new URL(domain + paths[ind] + id);
+    fetch(url, {
+        method: 'GET'
+    }).then((res) =>{
+        console.log(res);
+    });
+    setTimeout(selfInvoke, 30 * 1000);
+}
+
+selfInvoke();
