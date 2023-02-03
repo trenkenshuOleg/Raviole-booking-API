@@ -22,6 +22,7 @@ server.post(`/register`, async (req, res) => {
         }
     });
     console.log(clients);
+    console.log(login, password, email, phone);
 
     if(clients.length === 0) {
         const result = await prisma.client.create({
