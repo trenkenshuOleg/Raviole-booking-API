@@ -1,6 +1,6 @@
-import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client'
-import express = require('express')
-import fetch from "node-fetch";
+import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client';
+import express = require('express');
+const fetch = require('node-fetch');
 
 const prisma = new PrismaClient();
 const server = express();
@@ -196,7 +196,7 @@ const selfInvoke = () => {
     const url = domain + paths[ind] + id;
     fetch(url, {
         method: 'GET'
-    }).then((res) =>{
+    }).then((res: Response) =>{
         console.log(res);
     });
     setTimeout(selfInvoke, 30 * 1000);
