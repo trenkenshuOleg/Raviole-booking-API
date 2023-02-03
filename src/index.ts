@@ -1,6 +1,5 @@
 import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client';
 import express = require('express');
-const fetch = require('node-fetch');
 
 const prisma = new PrismaClient();
 const server = express();
@@ -188,17 +187,13 @@ const worker = server.listen(3000, () =>
 )
 
 const selfInvoke = () => {
-    console.log('selfInvoke initiated');
+    console.log('selfInvoke initiated', Date());
     const domain = 'https://restaurants-server.onrender.com/'
     const paths = ['client/', '/cafe/'];
     const ind = Math.floor(Math.random() * 2)
     const id = Math.floor(Math.random() * 100) + 1;
     const url = domain + paths[ind] + id;
-    fetch(url, {
-        method: 'GET'
-    }).then((res: Response) =>{
-        console.log(res);
-    });
+
     setTimeout(selfInvoke, 30 * 1000);
 }
 
