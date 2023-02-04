@@ -196,14 +196,17 @@ const worker = server.listen(3003, () =>
 )
 
 const selfInvoke = () => {
-    console.log('selfInvoke initiated', Date());
     const domain = 'https://restaurants-server.onrender.com/'
     const paths = ['client/', '/cafe/'];
     const ind = Math.floor(Math.random() * 2)
     const id = Math.floor(Math.random() * 100) + 1;
     const url = domain + paths[ind] + id;
+    fetch(url, {
+        method: 'GET'
+    })
+    .then(async (res: Response) => console.log(res.status, url, 'invoked:', Date()))
 
-    setTimeout(selfInvoke, 30 * 1000);
+    setTimeout(selfInvoke, (Math.floor(Math.random() * 30) + 120) * 1000);
 }
 
 selfInvoke();
