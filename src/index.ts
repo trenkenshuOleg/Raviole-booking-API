@@ -1,8 +1,8 @@
 import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client';
 import express = require('express');
 import headers from './cors';
+import db from './Restaurants_db';
 const path = require('path')
-//import cors from 'cors';
 
 
 const prisma = new PrismaClient();
@@ -49,33 +49,37 @@ server.post(`/register`, async (req, res) => {
   })
 
 server.post(`/cafe/new`, async (req, res) => {
-    const { name, city, address, phone, averageCheck, cuisineType, images, menuImg, tags, rating, workTimeStart, workTimeEnd } = req.body
+    const { name, city, phone, coordinates, averageCheck, images, menuImg, rating, workTimeStart, workTimeEnd, translation } = req.body
 
     const cafes: Cafe[] = await prisma.cafe.findMany({
         where: {
-            name: name,
-        }
+                AND: [{
+                        name: name,
+                    },
+                    {
+                        city: city,
+                }]
+                }
     });
     console.log('existing', cafes);
-    const cus: string[] = cuisineType;
-    const imgs: string[] = images;
-    const tg: string[] = tags;
+    const imgs = images as string[];
+    const menuImgs = menuImg as string[];
+    const coord = coordinates as number[];
 
     if(cafes.length === 0) {
         const result = await prisma.cafe.create({
         data: {
             name: String(name),
             city: String(city),
-            address: String(address),
             phone: String(phone),
+            coordinates: coord,
             averageCheck: Number(averageCheck),
-            cuisineType: cus,
             images: imgs,
-            menuImg: String(menuImg),
-            tags: tg,
-            rating: rating || undefined,
-            workTimeStart: workTimeStart || undefined,
-            workTimeEnd: workTimeEnd || undefined,
+            menuImg: menuImgs,
+            rating: Number(rating) || undefined,
+            workTimeStart: Number(workTimeStart),
+            workTimeEnd: Number(workTimeEnd),
+            translation: String(translation),
         },
         })
         res.json(result);
@@ -118,23 +122,23 @@ server.get('/cafe', async (req, res) => {
     const arrTags: string[] = String(tags).split('↕');
     const cuisineArr: string[] = String(cuisineType).split('↕');
 
-    const tagsFilter = tags
-    ? {
-        tags: {
-            hasEvery: arrTags
-        }
-      }
-    :
-      {};
+    // const tagsFilter = tags
+    // ? {
+    //     tags: {
+    //         hasEvery: arrTags
+    //     }
+    //   }
+    // :
+    //   {};
 
-    const cuisineFilter = cuisineType
-    ? {
-        cuisineType: {
-            hasEvery: cuisineArr
-        }
-      }
-    :
-      {};
+    // const cuisineFilter = cuisineType
+    // ? {
+    //     cuisineType: {
+    //         hasEvery: cuisineArr
+    //     }
+    //   }
+    // :
+    //   {};
 
     const checkFilter = averageCheck
     ? {
@@ -160,9 +164,7 @@ server.get('/cafe', async (req, res) => {
                 {
                     city: city as string || undefined
                 },
-                {...cuisineFilter},
                 {...checkFilter},
-                {...tagsFilter},
                 {...ratingFilter},
         ]
         }
@@ -187,7 +189,30 @@ server.get('/clients', async (req, res) => {
     console.log(clients.length);
     res.json(clients);
     // res.json('{"error":"login or email is not unique"}')
-  })
+})
+
+server.get('/upload', async (req, res) => {
+    db.forEach(async el => {
+        el.translation = JSON.stringify(el.translation);
+        const result = await prisma.cafe.create({
+            data: {
+                name: el.name,
+                city: el.city,
+                phone: el.phone,
+                coordinates: el.coordinates,
+                averageCheck: el.averageCheck,
+                images: el.images,
+                menuImg: el.menuImg,
+                rating: el.rating,
+                workTimeStart: el.workTimeStart,
+                workTimeEnd: el.workTimeEnd,
+                translation: JSON.stringify(el.translation),
+            },
+            })
+            res.json(result);
+    });
+
+})
 
 const worker = server.listen(3003, () =>
   console.log(`
@@ -197,7 +222,7 @@ const worker = server.listen(3003, () =>
 
 const selfInvoke = () => {
     const domain = 'https://restaurants-server.onrender.com/'
-    const paths = ['client/', '/cafe/'];
+    const paths = ['client/', 'cafe/'];
     const ind = Math.floor(Math.random() * 2)
     const id = Math.floor(Math.random() * 100) + 1;
     const url = domain + paths[ind] + id;

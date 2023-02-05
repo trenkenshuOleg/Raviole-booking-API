@@ -21,25 +21,23 @@ model Cafe {
     id            Int       @id @default(autoincrement())
     name          String    @unique
     city          String
-    address       String
     coordinates   Float[]
     phone         String
-    workTimeStart Int       @default(10)
-    workTimeEnd   Int       @default(22)
-    rating        Float     @default(0)
-    averageCheck  Float
-    cuisineType   String[]
-    reviews       Review[]
+    workTimeStart Int
+    workTimeEnd   Int
+    rating        Decimal   @default(0)
+    averageCheck  Decimal
     images        String[]
-    menuImg       String
-    tags          String[]
+    menuImg       String[]
+    reviews       Review[]
     bookings      Booking[]
+    translation   Json
 }
 
 model Review {
     id            Int       @id @default(autoincrement())
     author        Client    @relation(fields: [authorId], references: [id])
-    cafe          Cafe     @relation(fields: [cafeId], references: [id])
+    cafe          Cafe      @relation(fields: [cafeId], references: [id])
     cafeId        Int
     authorId      Int
     text          String
