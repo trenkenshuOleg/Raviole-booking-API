@@ -90,45 +90,54 @@ server.post(`/register`, async (req, res) => {
 
 server.get(`/cafe/:id`, async (req, res) => {
     const { id } = req.params;
-    const cafe: Cafe | null = await prisma.cafe.findUnique({
-        where : {
-            id: Number(id),
-        }
-    });
-    if(cafe) {
-        res.json(cafe);
+    if (isNaN(Number(id))) {
+        res.json(`{"error":"no such cafe id ${id} is NaN"}`)
     } else {
-        res.json(`{"error":"no such cafe with id ${id}"}`)
+        const cafe: Cafe | null = await prisma.cafe.findUnique({
+            where: {
+                id: Number(id),
+            }
+        });
+        if (cafe) {
+            res.json(cafe);
+        } else {
+            res.json(`{"error":"no such cafe with id ${id}"}`)
+        }
     }
+
 })
 
 server.get(`/client/:id`, async (req, res) => {
     const { id } = req.params;
-    const client: Client | null = await prisma.client.findUnique({
-        where : {
-            id: Number(id),
-        }
-    });
-    if(client) {
-        res.json(client);
+    if (isNaN(Number(id))) {
+        res.json(`{"error":"no such user id ${id} is NaN"}`)
     } else {
-        res.json(`{"error":"no such user id ${id}"}`)
+        const client: Client | null = await prisma.client.findUnique({
+            where: {
+                id: Number(id),
+            }
+        });
+        if (client) {
+            res.json(client);
+        } else {
+            res.json(`{"error":"no such user id ${id}"}`)
+        }
     }
+
 })
 
 server.get('/cafe', async (req, res) => {
-    const { city, cuisineType, averageCheck, rating, tags } = req.query;
-    const arrTags: string[] = String(tags).split('↕');
-    const cuisineArr: string[] = String(cuisineType).split('↕');
+    const { city, averageCheck, rating } = req.query;
+    console.log('get /cafe', city, averageCheck,  rating);
 
     const checkFilter = averageCheck
     ? {
-          averageCheck: {
+        averageCheck: {
             lte: Number(averageCheck)
-          }
-      }
+        }
+    }
     :
-      {};
+    {};
 
     const ratingFilter = rating
     ? {
@@ -136,11 +145,11 @@ server.get('/cafe', async (req, res) => {
             gte: Number(rating)
         }
       }
-    :
+      :
       {};
 
-    const ans = await prisma.cafe.findMany({
-        where: {
+      const ans = await prisma.cafe.findMany({
+          where: {
             AND: [
                 {
                     city: city as string || undefined
@@ -148,10 +157,24 @@ server.get('/cafe', async (req, res) => {
                 {...checkFilter},
                 {...ratingFilter},
         ]
-        }
-    })
-
+    }
+})
+    console.log('answer /cafe', ans)
     res.json(ans);
+})
+
+server.get(`/cafe/city/:city`, async (req, res) => {
+    const { city } = req.params;
+    const cafe: Cafe[] = await prisma.cafe.findMany({
+        where : {
+            city: String(city),
+        }
+    });
+    if(cafe) {
+        res.json(cafe);
+    } else {
+        res.json(`{"error":"no cafe in ${city}"}`)
+    }
 })
 
 server.get('/clients', async (req, res) => {
@@ -203,7 +226,7 @@ const worker = server.listen(3003, () =>
 )
 
 const selfInvoke = () => {
-    const domain = 'https://restaurants-server.onrender.com/'
+    const domain = 'https://restaurants-server.onrender-2.com/'
     const paths = ['client/', 'cafe/'];
     const ind = Math.floor(Math.random() * 2)
     const id = Math.floor(Math.random() * 100) + 1;
