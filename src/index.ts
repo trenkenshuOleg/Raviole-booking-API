@@ -2,7 +2,7 @@ import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client';
 import express = require('express');
 import headers from './cors';
 // import db from './Restaurants_db';
-import path from 'path';
+import path = require("path");
 
 
 const prisma = new PrismaClient();
