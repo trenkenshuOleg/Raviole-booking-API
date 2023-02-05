@@ -4,7 +4,6 @@ import headers from './cors';
 // import db from './Restaurants_db';
 import path = require("path");
 
-
 const prisma = new PrismaClient();
 const server = express();
 
