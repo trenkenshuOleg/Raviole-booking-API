@@ -39,12 +39,35 @@ server.post(`/register`, async (req, res) => {
             email,
             phone
         },
+        include: { favourites: true, reviews: true, bookings: true },
         })
         res.json(result)
     } else {
         res.json('{"error":"login or email is already taken"}')
     }
 
+})
+
+server.post('/login', async (req, res) => {
+    const { login, password } = req.body;
+    const client: Client[] = await prisma.client.findMany({
+        where: {
+            AND: [
+                {
+                    login: String(login),
+                },
+                {
+                    password: String(password),
+                },
+            ]
+        },
+        include: { favourites: true, reviews: true, bookings: true },
+    });
+    if(client.length === 1) {
+        res.json(client);
+    } else {
+        res.json('{"error":"wrong username or password"}')
+    }
 })
 
 // server.post(`/cafe/new`, async (req, res) => {
