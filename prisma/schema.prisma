@@ -15,6 +15,7 @@ model Client {
     phone       String
     reviews     Review[]
     bookings    Booking[]
+    favourites  Cafe[]
 }
 
 model Cafe {
@@ -32,6 +33,7 @@ model Cafe {
     reviews       Review[]
     bookings      Booking[]
     translation   Json
+    favourClients Client[]
 }
 
 model Review {

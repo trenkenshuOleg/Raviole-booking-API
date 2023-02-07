@@ -96,7 +96,8 @@ server.get(`/cafe/:id`, async (req, res) => {
         const cafe: Cafe | null = await prisma.cafe.findUnique({
             where: {
                 id: Number(id),
-            }
+            },
+            include: { favourClients : true, reviews: true, bookings: true }
         });
         if (cafe) {
             res.json(cafe);
@@ -115,7 +116,8 @@ server.get(`/client/:id`, async (req, res) => {
         const client: Client | null = await prisma.client.findUnique({
             where: {
                 id: Number(id),
-            }
+            },
+            include: { favourites: true, reviews: true, bookings: true }
         });
         if (client) {
             res.json(client);
@@ -195,6 +197,31 @@ server.get('/clients', async (req, res) => {
     // res.json('{"error":"login or email is not unique"}')
 })
 
+server.get('/favourites/:client')
+
+server.post('/favourite/:clientId/:cafeId', async (req, res) => {
+    const { clientId, cafeId } = req.params;
+    const beforeFavourites = await prisma.client.findUnique({
+        where: { id: Number(clientId) },
+        select: { favourites: true }
+    });
+    const beforeFavouritesIds =
+        beforeFavourites
+        ? beforeFavourites.favourites.map((el: Cafe) => el.id)
+        : [];
+    const addFavourite = await prisma.client.update({
+        where: {
+            id: Number(clientId)
+        },
+        data: {
+            favourites: { set: [...beforeFavouritesIds.map(el => {return {id: el}}), { id: Number(cafeId)}]}
+        }
+    });
+
+    console.log(addFavourite);
+    res.json(addFavourite);
+})
+
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
 //     db.forEach(async el => {
@@ -226,7 +253,7 @@ const worker = server.listen(3003, () =>
 )
 
 const selfInvoke = () => {
-    const domain = 'https://restaurants-server.onrender-2.com/'
+    const domain = 'https://restaurants-server-2.onrender.com/'
     const paths = ['client/', 'cafe/'];
     const ind = Math.floor(Math.random() * 2)
     const id = Math.floor(Math.random() * 100) + 1;

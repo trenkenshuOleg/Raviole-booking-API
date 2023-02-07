@@ -8,7 +8,7 @@ interface iTranslate {
 
 type iCoordinate = [number, number]
 
-interface iCafe extends Record<string, string | string[] | number | number[] | { [key: string]: iTranslate} | string > {
+interface iCafe extends Record<string, string | string[] | number | number[] | { [key: string]: iTranslate | string} > {
     coordinates: iCoordinate;
     city: string;
     name: string,
@@ -20,8 +20,8 @@ interface iCafe extends Record<string, string | string[] | number | number[] | {
     workTimeStart: number;
     workTimeEnd: number;
     translation: {
-        en: iTranslate,
-        ru: iTranslate,
+        en: iTranslate | string,
+        ru: iTranslate | string,
     } | string;
 
 }
