@@ -1,6 +1,6 @@
-import { PrismaClient, Prisma, Client, Cafe } from '@prisma/client';
+import { PrismaClient, Client, Cafe } from '@prisma/client';
 import express = require('express');
-import headers from './cors';
+import { headers, updateFavourites } from './helpers/helpers';
 // import db from './Restaurants_db';
 import path = require("path");
 
@@ -88,6 +88,26 @@ server.post(`/register`, async (req, res) => {
 
 //   })
 
+server.get(`/client/:id`, async (req, res) => {
+    const { id } = req.params;
+    if (isNaN(Number(id))) {
+        res.json(`{"error":"no such user id ${id} is NaN"}`)
+    } else {
+        const client: Client | null = await prisma.client.findUnique({
+            where: {
+                id: Number(id),
+            },
+            include: { favourites: true, reviews: true, bookings: true }
+        });
+        if (client) {
+            res.json(client);
+        } else {
+            res.json(`{"error":"no such user id ${id}"}`)
+        }
+    }
+
+})
+
 server.get(`/cafe/:id`, async (req, res) => {
     const { id } = req.params;
     if (isNaN(Number(id))) {
@@ -108,25 +128,6 @@ server.get(`/cafe/:id`, async (req, res) => {
 
 })
 
-server.get(`/client/:id`, async (req, res) => {
-    const { id } = req.params;
-    if (isNaN(Number(id))) {
-        res.json(`{"error":"no such user id ${id} is NaN"}`)
-    } else {
-        const client: Client | null = await prisma.client.findUnique({
-            where: {
-                id: Number(id),
-            },
-            include: { favourites: true, reviews: true, bookings: true }
-        });
-        if (client) {
-            res.json(client);
-        } else {
-            res.json(`{"error":"no such user id ${id}"}`)
-        }
-    }
-
-})
 
 server.get('/cafe', async (req, res) => {
     const { city, averageCheck, rating } = req.query;
@@ -197,30 +198,9 @@ server.get('/clients', async (req, res) => {
     // res.json('{"error":"login or email is not unique"}')
 })
 
-server.get('/favourites/:client')
+server.delete('/favourites/:clientId/:cafeId', updateFavourites)
 
-server.post('/favourite/:clientId/:cafeId', async (req, res) => {
-    const { clientId, cafeId } = req.params;
-    const beforeFavourites = await prisma.client.findUnique({
-        where: { id: Number(clientId) },
-        select: { favourites: true }
-    });
-    const beforeFavouritesIds =
-        beforeFavourites
-        ? beforeFavourites.favourites.map((el: Cafe) => el.id)
-        : [];
-    const addFavourite = await prisma.client.update({
-        where: {
-            id: Number(clientId)
-        },
-        data: {
-            favourites: { set: [...beforeFavouritesIds.map(el => {return {id: el}}), { id: Number(cafeId)}]}
-        }
-    });
-
-    console.log(addFavourite);
-    res.json(addFavourite);
-})
+server.post('/favourite/:clientId/:cafeId', updateFavourites)
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
