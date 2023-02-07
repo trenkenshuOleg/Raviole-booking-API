@@ -64,7 +64,7 @@ server.post('/login', async (req, res) => {
         include: { favourites: true, reviews: true, bookings: true },
     });
     if(client.length === 1) {
-        res.json(client);
+        res.json(client[0]);
     } else {
         res.json('{"error":"wrong username or password"}')
     }
