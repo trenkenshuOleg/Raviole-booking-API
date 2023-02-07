@@ -45,7 +45,7 @@ server.post(`/register`, async (req, res) => {
         res.json('{"error":"login or email is already taken"}')
     }
 
-  })
+})
 
 // server.post(`/cafe/new`, async (req, res) => {
 //     const { name, city, phone, coordinates, averageCheck, images, menuImg, rating, workTimeStart, workTimeEnd, translation } = req.body
@@ -108,6 +108,54 @@ server.get(`/client/:id`, async (req, res) => {
 
 })
 
+server.get('/clients', async (req, res) => {
+    const clients: Client[] = await prisma.client.findMany({
+        where: {
+            OR: [
+                {
+                    login: 'demo',
+                },
+                {
+                    email: 'xxx',
+                },
+            ]
+        }
+    });
+    console.log(clients.length);
+    res.json(clients);
+    // res.json('{"error":"login or email is not unique"}')
+})
+
+server.patch('client/edit/:id', async (req, res) => {
+    const { email, phone, password } = req.body;
+    const { id } = req.params;
+    const passObj =
+        password
+        ? { password }
+        : {};
+    const phoneObj =
+        phone
+        ? { phone }
+        : {};
+    const emailObj =
+        email
+        ? { email }
+        : {};
+
+    const result: Client | null = await prisma.client.update({
+        where: {
+            id: Number(id)
+        },
+        data: {
+            ...passObj,
+            ...emailObj,
+            ...phoneObj,
+        },
+        })
+
+        res.json(result)
+})
+
 server.get(`/cafe/:id`, async (req, res) => {
     const { id } = req.params;
     if (isNaN(Number(id))) {
@@ -159,7 +207,7 @@ server.get('/cafe', async (req, res) => {
                 },
                 {...checkFilter},
                 {...ratingFilter},
-        ]
+            ]
     }
 })
     console.log('answer /cafe', ans)
@@ -178,24 +226,6 @@ server.get(`/cafe/city/:city`, async (req, res) => {
     } else {
         res.json(`{"error":"no cafe in ${city}"}`)
     }
-})
-
-server.get('/clients', async (req, res) => {
-    const clients: Client[] = await prisma.client.findMany({
-        where: {
-            OR: [
-                {
-                    login: 'demo',
-                },
-                {
-                    email: 'xxx',
-                },
-            ]
-        }
-    });
-    console.log(clients.length);
-    res.json(clients);
-    // res.json('{"error":"login or email is not unique"}')
 })
 
 server.delete('/favourites/:clientId/:cafeId', updateFavourites)
