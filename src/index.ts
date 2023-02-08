@@ -1,15 +1,14 @@
 import { PrismaClient, Client, Cafe } from '@prisma/client';
 import express = require('express');
-import { headers, updateFavourites, createReview, updateReview, createBooking, updateBooking } from './helpers/helpers';
+import loader from './helpers/helpers';
 // import db from './Restaurants_db';
 import path = require("path");
-import cors = require('cors');
 
 const prisma = new PrismaClient();
 const server = express();
 
 server.use('/img', express.static(path.join(__dirname, '../img')))
-server.use(headers);
+server.use(loader.headers);
 server.use(express.json());
 
 console.log(__dirname);
@@ -251,21 +250,21 @@ server.get(`/cafe/city/:city`, async (req, res) => {
     }
 })
 
-server.delete('/favourites/:clientId/:cafeId', (req, res) => updateFavourites(req, res))
+server.delete('/favourites/:clientId/:cafeId', loader.updateFavourites);
 
-server.post('/favourites/:clientId/:cafeId', (req, res) => updateFavourites(req, res))
+server.post('/favourites/:clientId/:cafeId', loader.updateFavourites);
 
-server.post('/reviews', (req, res) => createReview(req, res))
+server.post('/reviews', loader.createReview);
 
-server.patch('/reviews', (req, res) => updateReview(req, res))
+server.patch('/reviews', loader.updateReview)
 
-server.delete('/reviews', (req, res) => updateReview(req, res))
+server.delete('/reviews', loader.updateReview)
 
-server.post('/bookings', (req, res) => createBooking(req, res))
+server.post('/bookings', loader.createBooking)
 
-server.patch('/bookings', (req, res) => updateBooking(req, res))
+server.patch('/bookings', loader.updateBooking)
 
-server.delete('/bookings', (req, res) => updateBooking(req, res))
+server.delete('/bookings', loader.updateBooking)
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];

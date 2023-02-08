@@ -149,4 +149,5 @@ const updateBooking = async (req: Request, res: Response) => {
 
 }
 
-export { headers, updateFavourites, createReview, updateReview, createBooking, updateBooking}
+const loader = { headers, createReview, updateFavourites, updateReview, createBooking, updateBooking}
+export default loader;
