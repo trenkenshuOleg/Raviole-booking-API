@@ -3,6 +3,7 @@ import express = require('express');
 import { headers, updateFavourites, createReview, updateReview, createBooking, updateBooking } from './helpers/helpers';
 // import db from './Restaurants_db';
 import path = require("path");
+import cors = require('cors');
 
 const prisma = new PrismaClient();
 const server = express();
@@ -149,9 +150,8 @@ server.get('/clients', async (req, res) => {
     // res.json('{"error":"login or email is not unique"}')
 })
 
-server.patch('client/edit/:id', async (req, res) => {
-    const { email, phone, password } = req.body;
-    const { id } = req.params;
+server.patch('client/edit', async (req, res) => {
+    const { id, email, phone, password } = req.body;
     const passObj =
         password
             ? { password }
@@ -251,21 +251,21 @@ server.get(`/cafe/city/:city`, async (req, res) => {
     }
 })
 
-server.delete('/favourites/:clientId/:cafeId', updateFavourites)
+server.delete('/favourites/:clientId/:cafeId', (req, res) => updateFavourites(req, res))
 
-server.post('/favourites/:clientId/:cafeId', updateFavourites)
+server.post('/favourites/:clientId/:cafeId', (req, res) => updateFavourites(req, res))
 
-server.post('/reviews', createReview)
+server.post('/reviews', (req, res) => createReview(req, res))
 
-server.patch('/reviews', updateReview)
+server.patch('/reviews', (req, res) => updateReview(req, res))
 
-server.delete('/reviews', updateReview)
+server.delete('/reviews', (req, res) => updateReview(req, res))
 
-server.post('/bookings', createBooking)
+server.post('/bookings', (req, res) => createBooking(req, res))
 
-server.patch('/bookings', updateBooking)
+server.patch('/bookings', (req, res) => updateBooking(req, res))
 
-server.delete('/bookings', updateBooking)
+server.delete('/bookings', (req, res) => updateBooking(req, res))
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
