@@ -31,15 +31,15 @@ server.post(`/register`, async (req, res) => {
     console.log('existing', clients);
     console.log('req', req.body);
 
-    if(clients.length === 0) {
+    if (clients.length === 0) {
         const result = await prisma.client.create({
-        data: {
-            login,
-            password,
-            email,
-            phone
-        },
-        include: { favourites: true, reviews: true, bookings: true },
+            data: {
+                login,
+                password,
+                email,
+                phone
+            },
+            include: { favourites: true, reviews: true, bookings: true },
         })
         res.json(result)
     } else {
@@ -63,7 +63,7 @@ server.post('/login', async (req, res) => {
         },
         include: { favourites: true, reviews: true, bookings: true },
     });
-    if(client.length === 1) {
+    if (client.length === 1) {
         res.json(client[0]);
     } else {
         res.json('{"error":"wrong username or password"}')
@@ -154,16 +154,16 @@ server.patch('client/edit/:id', async (req, res) => {
     const { id } = req.params;
     const passObj =
         password
-        ? { password }
-        : {};
+            ? { password }
+            : {};
     const phoneObj =
         phone
-        ? { phone }
-        : {};
+            ? { phone }
+            : {};
     const emailObj =
         email
-        ? { email }
-        : {};
+            ? { email }
+            : {};
 
     const result: Client | null = await prisma.client.update({
         where: {
@@ -174,9 +174,9 @@ server.patch('client/edit/:id', async (req, res) => {
             ...emailObj,
             ...phoneObj,
         },
-        })
+    })
 
-        res.json(result)
+    res.json(result)
 })
 
 server.get(`/cafe/:id`, async (req, res) => {
@@ -188,7 +188,7 @@ server.get(`/cafe/:id`, async (req, res) => {
             where: {
                 id: Number(id),
             },
-            include: { favourClients : true, reviews: true, bookings: true }
+            include: { favourClients: true, reviews: true, bookings: true }
         });
         if (cafe) {
             res.json(cafe);
@@ -202,37 +202,37 @@ server.get(`/cafe/:id`, async (req, res) => {
 
 server.get('/cafe', async (req, res) => {
     const { city, averageCheck, rating } = req.query;
-    console.log('get /cafe', city, averageCheck,  rating);
+    console.log('get /cafe', city, averageCheck, rating);
 
     const checkFilter = averageCheck
-    ? {
-        averageCheck: {
-            lte: Number(averageCheck)
+        ? {
+            averageCheck: {
+                lte: Number(averageCheck)
+            }
         }
-    }
-    :
-    {};
+        :
+        {};
 
     const ratingFilter = rating
-    ? {
-        rating: {
-            gte: Number(rating)
+        ? {
+            rating: {
+                gte: Number(rating)
+            }
         }
-      }
-      :
-      {};
+        :
+        {};
 
-      const ans = await prisma.cafe.findMany({
-          where: {
+    const ans = await prisma.cafe.findMany({
+        where: {
             AND: [
                 {
                     city: city as string || undefined
                 },
-                {...checkFilter},
-                {...ratingFilter},
+                { ...checkFilter },
+                { ...ratingFilter },
             ]
-    }
-})
+        }
+    })
     console.log('answer /cafe', ans)
     res.json(ans);
 })
@@ -240,11 +240,11 @@ server.get('/cafe', async (req, res) => {
 server.get(`/cafe/city/:city`, async (req, res) => {
     const { city } = req.params;
     const cafe: Cafe[] = await prisma.cafe.findMany({
-        where : {
+        where: {
             city: String(city),
         }
     });
-    if(cafe) {
+    if (cafe) {
         res.json(cafe);
     } else {
         res.json(`{"error":"no cafe in ${city}"}`)
@@ -253,7 +253,9 @@ server.get(`/cafe/city/:city`, async (req, res) => {
 
 server.delete('/favourites/:clientId/:cafeId', updateFavourites)
 
-server.post('/favourite/:clientId/:cafeId', updateFavourites)
+server.post('/favourites/:clientId/:cafeId', updateFavourites)
+
+server.post('/reviews',)
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
@@ -279,9 +281,11 @@ server.post('/favourite/:clientId/:cafeId', updateFavourites)
 
 // })
 
-const worker = server.listen(3003, () =>
-  console.log(`
-🚀 Server ready at: http://localhost:3003
+const port = 3003;
+
+const worker = server.listen(port, () =>
+    console.log(`
+🚀 Server ready at: http://localhost:${port}
 ⭐️ Start doing some stuff`),
 )
 
@@ -294,8 +298,8 @@ const selfInvoke = () => {
     fetch(url, {
         method: 'GET'
     })
-    .then(async (res: Response) => console.log(res.status, url, 'invoked:', Date()))
-    .catch((err: Error) => console.log(err.message))
+        .then(async (res: Response) => console.log(res.status, url, 'invoked:', Date()))
+        .catch((err: Error) => console.log(err.message))
 
     setTimeout(selfInvoke, (Math.floor(Math.random() * 30) + 120) * 1000);
 }
