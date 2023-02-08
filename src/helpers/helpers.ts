@@ -63,14 +63,21 @@ const createReview = async (req: Request, res: Response) => {
 
 const updateReview = async (req: Request, res: Response) => {
     const { id, text, rating } = req.body;
-
+    const textObj =
+        text
+            ? {text: String(text)}
+            : {}
+    const ratingObj =
+        text
+            ? {rating: Number(rating)}
+            : {}
     switch (req.method) {
         case 'PATCH':
             const updated = await prisma.review.update({
                 where: { id: Number(id) },
                 data: {
-                    text: String(text),
-                    rating: Number(rating)
+                    ...textObj,
+                    ...ratingObj
                 }
             })
             res.json(updated)
@@ -86,4 +93,60 @@ const updateReview = async (req: Request, res: Response) => {
     }
 
 }
-export { headers, updateFavourites, createReview, updateReview }
+
+const createBooking = async (req: Request, res: Response) => {
+    const { clientId, cafeId, tableId, date, duration } = req.body;
+
+    const booking = await prisma.booking.create({
+        data: {
+            guestId: Number(clientId),
+            cafeId: Number(cafeId),
+            tableId: Number(tableId),
+            date: date as Date,
+            duration: Number(duration),
+        }
+    })
+
+    res.json(booking);
+}
+
+const updateBooking = async (req: Request, res: Response) => {
+    const { id, tableId, date, duration } = req.body;
+    const tableObj =
+        tableId
+            ? { tableId: Number(tableId) }
+            : {};
+    const dateObj =
+        date
+            ? { date: date as Date }
+            : {};
+    const durationObj =
+        duration
+            ? { duration: Number(duration) }
+            : {};
+
+    switch (req.method) {
+        case 'PATCH':
+            const updated = await prisma.booking.update({
+                where: { id: Number(id) },
+                data: {
+                    ...tableObj,
+                    ...dateObj,
+                    ...durationObj,
+                }
+            })
+            res.json(updated)
+            break;
+        case 'DELETE':
+            const deleted = await prisma.booking.delete({
+                where: { id: Number(id) }
+            });
+            res.json(deleted);
+            break;
+        default :
+        res.json('{"error":"updateBooking wrong request method"}');
+    }
+
+}
+
+export { headers, updateFavourites, createReview, updateReview, createBooking, updateBooking}

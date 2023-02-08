@@ -1,6 +1,6 @@
 import { PrismaClient, Client, Cafe } from '@prisma/client';
 import express = require('express');
-import { headers, updateFavourites } from './helpers/helpers';
+import { headers, updateFavourites, createReview, updateReview, createBooking, updateBooking } from './helpers/helpers';
 // import db from './Restaurants_db';
 import path = require("path");
 
@@ -255,7 +255,17 @@ server.delete('/favourites/:clientId/:cafeId', updateFavourites)
 
 server.post('/favourites/:clientId/:cafeId', updateFavourites)
 
-server.post('/reviews',)
+server.post('/reviews', createReview)
+
+server.patch('/reviews', updateReview)
+
+server.delete('/reviews', updateReview)
+
+server.post('/bookings', createBooking)
+
+server.patch('/bookings', updateBooking)
+
+server.delete('/bookings', updateBooking)
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
