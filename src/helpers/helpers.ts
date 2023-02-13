@@ -112,6 +112,7 @@ const createBooking = async (req: Request, res: Response) => {
 
 const updateBooking = async (req: Request, res: Response) => {
     const { id, tableId, date, duration } = req.body;
+    const { idFromParam } = req.params;
     const tableObj =
         tableId
             ? { tableId: Number(tableId) }
@@ -139,7 +140,7 @@ const updateBooking = async (req: Request, res: Response) => {
             break;
         case 'DELETE':
             const deleted = await prisma.booking.delete({
-                where: { id: Number(id) }
+                where: { id: Number(idFromParam) }
             });
             res.json(deleted);
             break;

@@ -1,13 +1,10 @@
 const func = async () => {
-    const response = await fetch('http://localhost:3003/bookings', {
-        method: 'PATCH',
+    const response = await fetch('https://restaurants-server-2.onrender.com/cafe/7', {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            id: 1,
-            tableId: 100,
-        }),
+        // body: JSON.stringify({}),
     });
     console.log(await response.text());
 };

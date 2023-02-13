@@ -149,7 +149,7 @@ server.get('/clients', async (req, res) => {
     // res.json('{"error":"login or email is not unique"}')
 })
 
-server.patch('client/edit', async (req, res) => {
+server.put('client/edit', async (req, res) => {
     const { id, email, phone, password } = req.body;
     const passObj =
         password
@@ -192,6 +192,7 @@ server.get(`/cafe/:id`, async (req, res) => {
         if (cafe) {
             res.json(cafe);
         } else {
+            res.status(404);
             res.json(`{"error":"no such cafe with id ${id}"}`)
         }
     }
@@ -258,13 +259,13 @@ server.post('/reviews', loader.createReview);
 
 server.patch('/reviews', loader.updateReview)
 
-server.delete('/reviews', loader.updateReview)
+server.delete('/reviews/:id', loader.updateReview)
 
 server.post('/bookings', loader.createBooking)
 
 server.patch('/bookings', loader.updateBooking)
 
-server.delete('/bookings', loader.updateBooking)
+server.delete('/bookings/:id', loader.updateBooking)
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
