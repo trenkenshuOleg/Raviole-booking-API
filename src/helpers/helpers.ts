@@ -142,6 +142,7 @@ const updateBooking = async (req: Request, res: Response) => {
             const deleted = await prisma.booking.delete({
                 where: { id: Number(idFromParam) }
             });
+            console.log('deleting', Number(idFromParam))
             res.json(deleted);
             break;
         default :

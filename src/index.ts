@@ -149,8 +149,9 @@ server.get('/clients', async (req, res) => {
     // res.json('{"error":"login or email is not unique"}')
 })
 
-server.put('client/edit', async (req, res) => {
+server.post('client/edit', async (req, res) => {
     const { id, email, phone, password } = req.body;
+    console.log('client/edit', id, email, phone, password)
     const passObj =
         password
             ? { password }
@@ -265,7 +266,7 @@ server.post('/bookings', loader.createBooking)
 
 server.patch('/bookings', loader.updateBooking)
 
-server.delete('/bookings/:id', loader.updateBooking)
+server.get('/bookings/:id', loader.updateBooking)
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
