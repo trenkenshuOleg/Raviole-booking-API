@@ -147,7 +147,7 @@ server.get(`/client/:id`, async (req, res) => {
 
 })
 
-server.patch('client/edit', async (req, res) => {
+server.patch('/client/edit', async (req, res) => {
     const { id, email, phone, password } = req.body;
     console.log('client/edit', id, email, phone, password)
     const passObj =
@@ -281,7 +281,7 @@ server.post('/bookings', loader.createBooking)
 server.patch('/bookings', loader.updateBooking)
 
 server.delete('/bookings/:id', loader.updateBooking)
-// reinit render
+
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];
 //     db.forEach(async el => {
@@ -315,7 +315,7 @@ const worker = server.listen(port, () =>
 )
 
 const selfInvoke = () => {
-    const domain = 'https://restaurants-server-2.onrender.com/'
+    const domain = 'https://restaurants-server-3.onrender.com/'
     const paths = ['client/', 'cafe/'];
     const ind = Math.floor(Math.random() * 2)
     const id = Math.floor(Math.random() * 100) + 1;

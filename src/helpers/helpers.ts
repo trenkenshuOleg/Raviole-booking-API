@@ -63,7 +63,7 @@ const createReview = async (req: Request, res: Response) => {
 
 const updateReview = async (req: Request, res: Response) => {
     const { id, text, rating } = req.body;
-    const { idFromParam } = req.params;
+    const idFromParam = Number(req.params.id);
     const textObj =
         text
             ? {text: String(text)}
@@ -84,11 +84,11 @@ const updateReview = async (req: Request, res: Response) => {
             res.json(updated)
             break;
         case 'DELETE':
+            console.log('deleting review #', Number(idFromParam))
             const deleted = await prisma.review.delete({
-                where: { id: Number(idFromParam) }
+                where: { id: idFromParam }
             });
             res.json(deleted);
-            console.log('deleting review #', Number(idFromParam))
             break;
         default :
         res.json('{"error":"updateReview wrong request method"}');
@@ -114,7 +114,7 @@ const createBooking = async (req: Request, res: Response) => {
 
 const updateBooking = async (req: Request, res: Response) => {
     const { id, tableId, date, duration } = req.body;
-    const { idFromParam } = req.params;
+    const idFromParam = Number(req.params.id);
     const tableObj =
         tableId
             ? { tableId: Number(tableId) }
@@ -141,10 +141,10 @@ const updateBooking = async (req: Request, res: Response) => {
             res.json(updated)
             break;
         case 'DELETE':
+            console.log('deleting booking #', req.params.id)
             const deleted = await prisma.booking.delete({
-                where: { id: Number(idFromParam) }
+                where: { id: idFromParam }
             });
-            console.log('deleting booking #', Number(idFromParam))
             res.json(deleted);
             break;
         default :
