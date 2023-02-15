@@ -61,7 +61,17 @@ server.post('/login', async (req, res) => {
                 },
             ]
         },
-        include: { favourites: true, reviews: true, bookings: true },
+        include: {
+            favourites: true,
+            reviews: {
+                include: {
+                    cafe: true,
+                }
+            }, bookings: {
+                include: {
+                    cafe: true,
+                }
+            }},
     });
     if (client.length === 1) {
         res.json(client[0]);
@@ -130,6 +140,9 @@ server.get(`/client/:id`, async (req, res) => {
                     include: {
                         cafe: true,
                     },
+                    orderBy: {
+                        rating: 'asc'
+                    }
                 },
                 bookings: {
                     include: {
@@ -264,6 +277,41 @@ server.get(`/cafe/city/:city`, async (req, res) => {
     } else {
         res.json(`{"error":"no cafe in ${city}"}`)
     }
+})
+
+const x = {
+    en: {
+        name: 'Ronin',
+        city: 'Minsk',
+        address: '78 Maxim Bogdanovich str.',
+        description: 'RONIN is an independent warrior who does not belong to either the clan or the master. He is free and open to everything new and interesting.',
+        cuisineType: [
+            'Japanese',
+        ],
+    },
+    ru: {
+        name: 'Ронин',
+        city: 'Минск',
+        address: 'ул. Максима Богдановича 78',
+        description: 'RONIN — независимый воин, не принадлежащий ни клану, ни хозяину. Он свободен и открыт всему новому и интересному.',
+        cuisineType: [
+            'Японская',
+        ],
+    }
+}
+
+
+server.get('/upd', async (req, res) => {
+    const upd = await prisma.cafe.update({
+        where: {
+            id: 4
+        },
+        data: {
+            translation: JSON.stringify(x),
+        }
+    });
+
+    res.json(upd)
 })
 
 server.delete('/favourites/:clientId/:cafeId', loader.updateFavourites);
