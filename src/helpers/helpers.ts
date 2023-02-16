@@ -82,7 +82,19 @@ const createReview = async (req: Request, res: Response) => {
                 id: Number(cafeId)
             },
             data: {
-                rating: average
+                rating: average.toFixed(1)
+            },
+            include: {
+                reviews: {
+                    include: {
+                        author: true,
+                    }
+                },
+                bookings: {
+                    include: {
+                        guest: true,
+                    }
+                }
             }
         })
         res.json(updated);
