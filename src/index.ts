@@ -37,7 +37,8 @@ server.post(`/register`, async (req, res) => {
                 login,
                 password,
                 email,
-                phone
+                phone,
+                bonusPoints: 0,
             },
             include: { favourites: true, reviews: true, bookings: true },
         })
@@ -265,54 +266,20 @@ server.get('/cafe', async (req, res) => {
     res.json(ans);
 })
 
-server.get(`/cafe/city/:city`, async (req, res) => {
-    const { city } = req.params;
-    const cafe: Cafe[] = await prisma.cafe.findMany({
-        where: {
-            city: String(city),
-        }
-    });
-    if (cafe) {
-        res.json(cafe);
-    } else {
-        res.json(`{"error":"no cafe in ${city}"}`)
-    }
-})
+server.get(`/cafe/city/:city`, loader.getByCity)
 
-const x = {
-    en: {
-        name: 'Ronin',
-        city: 'Minsk',
-        address: '78 Maxim Bogdanovich str.',
-        description: 'RONIN is an independent warrior who does not belong to either the clan or the master. He is free and open to everything new and interesting.',
-        cuisineType: [
-            'Japanese',
-        ],
-    },
-    ru: {
-        name: 'Ронин',
-        city: 'Минск',
-        address: 'ул. Максима Богдановича 78',
-        description: 'RONIN — независимый воин, не принадлежащий ни клану, ни хозяину. Он свободен и открыт всему новому и интересному.',
-        cuisineType: [
-            'Японская',
-        ],
-    }
-}
+// server.get('/upd', async (req, res) => {
+//     const upd = await prisma.cafe.update({
+//         where: {
+//             id: 4
+//         },
+//         data: {
+//             translation: JSON.stringify(x),
+//         }
+//     });
 
-
-server.get('/upd', async (req, res) => {
-    const upd = await prisma.cafe.update({
-        where: {
-            id: 4
-        },
-        data: {
-            translation: JSON.stringify(x),
-        }
-    });
-
-    res.json(upd)
-})
+//     res.json(upd)
+// })
 
 server.delete('/favourites/:clientId/:cafeId', loader.updateFavourites);
 

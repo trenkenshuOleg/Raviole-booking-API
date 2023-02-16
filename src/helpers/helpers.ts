@@ -18,6 +18,7 @@ const updateFavourites = async (req: Request, res: Response) => {
         where: { id: Number(clientId) },
         select: { favourites: true }
     });
+
     let favouritesIds =
         beforeFavourites
             ? beforeFavourites.favourites.map((el: Cafe) => el.id)
@@ -28,6 +29,7 @@ const updateFavourites = async (req: Request, res: Response) => {
             favouritesIds.push(Number(cafeId));
             break;
         case 'DELETE':
+            console.log('deleting favourite #', cafeId)
             favouritesIds = favouritesIds.filter(el => el !== Number(cafeId));
             break;
     }
@@ -153,5 +155,31 @@ const updateBooking = async (req: Request, res: Response) => {
 
 }
 
-const loader = { headers, createReview, updateFavourites, updateReview, createBooking, updateBooking}
+const getByCity = async (req: Request, res: Response) => {
+    const { city } = req.params;
+    const cafe: Cafe[] = await prisma.cafe.findMany({
+        where: {
+            city: String(city),
+        },
+        include: {
+            bookings: {
+                include: {
+                    guest: true
+                }
+            },
+            reviews: {
+                include: {
+                    author: true
+                }
+            }
+        }
+    });
+    if (cafe) {
+        res.json(cafe);
+    } else {
+        res.json(`{"error":"no cafe in ${city}"}`)
+    }
+}
+
+const loader = { headers, createReview, updateFavourites, updateReview, createBooking, updateBooking, getByCity}
 export default loader;
