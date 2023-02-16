@@ -51,16 +51,43 @@ const updateFavourites = async (req: Request, res: Response) => {
 const createReview = async (req: Request, res: Response) => {
     const { clientId, cafeId, text, rating } = req.body;
 
-    const review = await prisma.review.create({
+    const review = prisma.review.create({
         data: {
             authorId: Number(clientId),
             cafeId: Number(cafeId),
             text: String(text),
             rating: Number(rating),
         }
+    });
+    review
+    .then(() => {
+        const cafeWithReviews = prisma.cafe.findUnique({
+            where: {
+                id: Number(cafeId)
+            }, include: {
+                reviews: true,
+            }
+        });
+        return cafeWithReviews
+    })
+    .then(async (data) => {
+        const marks: number[] = [];
+        data?.reviews.forEach((el => {
+            marks.push(el.rating);
+        }))
+        const average = marks.reduce( (sum, cur) => sum + cur) / marks.length;
+
+        const updated = await prisma.cafe.update({
+            where: {
+                id: Number(cafeId)
+            },
+            data: {
+                rating: average
+            }
+        })
+        res.json(updated);
     })
 
-    res.json(review);
 }
 
 const updateReview = async (req: Request, res: Response) => {
