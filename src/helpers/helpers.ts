@@ -142,12 +142,12 @@ const createReview = async (req: Request, res: Response) => {
         .then(async (data) => {
             data &&  res.json(await restWithUdatedRating(data));
         })
-        addUserBonus( +clientId, 5);
+        addUserBonus( +clientId, 1);
 
 }
 
 const updateReview = async (req: Request, res: Response) => {
-    const { id, text, rating } = req.body;
+    const { id, text, rating, userId } = req.body;
     const idFromParam = Number(req.params.id);
     const textObj =
         text
@@ -187,7 +187,8 @@ const updateReview = async (req: Request, res: Response) => {
                 })
                 .then((rest) => {
                     rest &&  res.json(restWithUdatedRating(rest));
-                })
+                });
+            addUserBonus( +userId, -1);
             break;
         default :
         res.json('{"error":"updateReview wrong request method"}');
@@ -213,7 +214,7 @@ const createBooking = async (req: Request, res: Response) => {
 }
 
 const updateBooking = async (req: Request, res: Response) => {
-    const { id, tableId, date, duration } = req.body;
+    const { id, tableId, date, duration, userId } = req.body;
     const idFromParam = Number(req.params.id);
     const tableObj =
         tableId
@@ -245,6 +246,7 @@ const updateBooking = async (req: Request, res: Response) => {
             const deleted = await prisma.booking.delete({
                 where: { id: idFromParam }
             });
+            addUserBonus( +userId, -5);
             res.json(deleted);
             break;
         default :
