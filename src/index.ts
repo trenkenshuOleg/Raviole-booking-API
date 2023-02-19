@@ -289,13 +289,13 @@ server.post('/reviews', loader.createReview);
 
 server.patch('/reviews', loader.updateReview)
 
-server.delete('/reviews/:id', loader.updateReview)
+server.delete('/reviews/:clientId/:id', loader.updateReview)
 
 server.post('/bookings', loader.createBooking)
 
 server.patch('/bookings', loader.updateBooking)
 
-server.delete('/bookings/:id', loader.updateBooking)
+server.delete('/bookings/:clientId/:id', loader.updateBooking)
 
 // server.get('/upload', async (req, res) => {
 //     let ans: Cafe[] = [];

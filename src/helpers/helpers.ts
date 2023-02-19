@@ -147,8 +147,9 @@ const createReview = async (req: Request, res: Response) => {
 }
 
 const updateReview = async (req: Request, res: Response) => {
-    const { id, text, rating, userId } = req.body;
+    const { id, text, rating } = req.body;
     const idFromParam = Number(req.params.id);
+    const userId = Number(req.params.clientId);
     const textObj =
         text
             ? {text: String(text)}
@@ -214,8 +215,9 @@ const createBooking = async (req: Request, res: Response) => {
 }
 
 const updateBooking = async (req: Request, res: Response) => {
-    const { id, tableId, date, duration, userId } = req.body;
+    const { id, tableId, date, duration } = req.body;
     const idFromParam = Number(req.params.id);
+    const userId = Number(req.params.clientId);
     const tableObj =
         tableId
             ? { tableId: Number(tableId) }
