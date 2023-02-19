@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient, Cafe } from '@prisma/client';
+import { PrismaClient, Cafe, Prisma, Review } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -10,6 +10,64 @@ const headers = (req: Request, res: Response, next: NextFunction) => {
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
     res.setHeader('Access-Control-Allow-Credentials', 'true')
     next()
+}
+
+const restWithUdatedRating = async (data: Cafe & { reviews: Review[]},) => {
+    const marks: number[] = [];
+        data?.reviews.forEach((el => {
+            marks.push(el.rating);
+        }))
+        const average = marks.reduce( (sum, cur) => sum + cur) / marks.length;
+
+        const updated = await prisma.cafe.update({
+            where: {
+                id: data.id
+            },
+            data: {
+                rating: average.toFixed(1)
+            },
+            include: {
+                reviews: {
+                    include: {
+                        author: true,
+                    }
+                },
+                bookings: {
+                    include: {
+                        guest: true,
+                    }
+                }
+            }
+        })
+
+        return updated
+}
+
+const getCafeWithRewiews = async (id: number) => {
+    const rest = prisma.cafe.findUnique({
+        where: {
+            id
+        },
+        include: {
+            reviews: true,
+        }
+    })
+
+    return rest
+}
+
+const addUserBonus = async (clientId: number, newPoints: number) => {
+    const updated = prisma.client.update({
+        where: {
+            id: clientId
+        },
+        data: {
+            bonusPoints: {
+                increment: newPoints,
+            },
+        },
+    })
+    return updated
 }
 
 const updateFavourites = async (req: Request, res: Response) => {
@@ -41,7 +99,18 @@ const updateFavourites = async (req: Request, res: Response) => {
         data: {
             favourites: { set: [...favouritesIds.map(el => { return { id: el } })] }
         },
-        include: { favourites: true, reviews: true, bookings: true }
+        include: {
+            favourites: true,
+            reviews: {
+                include: {
+                    cafe: true
+                }
+            },
+            bookings: {
+                include: {
+                    cafe: true
+                }
+            } }
     });
 
     console.log(addFavourite);
@@ -60,45 +129,20 @@ const createReview = async (req: Request, res: Response) => {
         }
     });
     review
-    .then(() => {
-        const cafeWithReviews = prisma.cafe.findUnique({
-            where: {
-                id: Number(cafeId)
-            }, include: {
-                reviews: true,
-            }
-        });
-        return cafeWithReviews
-    })
-    .then(async (data) => {
-        const marks: number[] = [];
-        data?.reviews.forEach((el => {
-            marks.push(el.rating);
-        }))
-        const average = marks.reduce( (sum, cur) => sum + cur) / marks.length;
-
-        const updated = await prisma.cafe.update({
-            where: {
-                id: Number(cafeId)
-            },
-            data: {
-                rating: average.toFixed(1)
-            },
-            include: {
-                reviews: {
-                    include: {
-                        author: true,
-                    }
-                },
-                bookings: {
-                    include: {
-                        guest: true,
-                    }
+        .then(() => {
+            const cafeWithReviews = prisma.cafe.findUnique({
+                where: {
+                    id: Number(cafeId)
+                }, include: {
+                    reviews: true,
                 }
-            }
+            });
+            return cafeWithReviews
         })
-        res.json(updated);
-    })
+        .then(async (data) => {
+            data &&  res.json(restWithUdatedRating(data));
+        })
+        addUserBonus( +clientId, 5);
 
 }
 
@@ -115,21 +159,35 @@ const updateReview = async (req: Request, res: Response) => {
             : {}
     switch (req.method) {
         case 'PATCH':
-            const updated = await prisma.review.update({
+            const updated = prisma.review.update({
                 where: { id: Number(id) },
                 data: {
                     ...textObj,
                     ...ratingObj
                 }
-            })
-            res.json(updated)
+            });
+
+            updated
+                .then((review) => {
+                    return getCafeWithRewiews(review.cafeId)
+                })
+                .then((rest) => {
+                    rest &&  res.json(restWithUdatedRating(rest));
+                })
+
             break;
         case 'DELETE':
             console.log('deleting review #', Number(idFromParam))
-            const deleted = await prisma.review.delete({
+            const deleted = prisma.review.delete({
                 where: { id: idFromParam }
             });
-            res.json(deleted);
+            deleted
+                .then((review) => {
+                    return getCafeWithRewiews(review.cafeId)
+                })
+                .then((rest) => {
+                    rest &&  res.json(restWithUdatedRating(rest));
+                })
             break;
         default :
         res.json('{"error":"updateReview wrong request method"}');
@@ -149,6 +207,7 @@ const createBooking = async (req: Request, res: Response) => {
             duration: Number(duration),
         }
     })
+    addUserBonus( +clientId, 5);
 
     res.json(booking);
 }
@@ -219,6 +278,7 @@ const getByCity = async (req: Request, res: Response) => {
         res.json(`{"error":"no cafe in ${city}"}`)
     }
 }
+
 
 const loader = { headers, createReview, updateFavourites, updateReview, createBooking, updateBooking, getByCity}
 export default loader;
