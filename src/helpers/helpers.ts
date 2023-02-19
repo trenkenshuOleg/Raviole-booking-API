@@ -140,7 +140,7 @@ const createReview = async (req: Request, res: Response) => {
             return cafeWithReviews
         })
         .then(async (data) => {
-            data &&  res.json(restWithUdatedRating(data));
+            data &&  res.json(await restWithUdatedRating(data));
         })
         addUserBonus( +clientId, 5);
 
@@ -171,8 +171,8 @@ const updateReview = async (req: Request, res: Response) => {
                 .then((review) => {
                     return getCafeWithRewiews(review.cafeId)
                 })
-                .then((rest) => {
-                    rest &&  res.json(restWithUdatedRating(rest));
+                .then(async (rest) => {
+                    rest &&  res.json(await restWithUdatedRating(rest));
                 })
 
             break;

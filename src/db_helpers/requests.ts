@@ -27,13 +27,13 @@ const funcUpd = async () => {
 };
 
 const addFav = async () => {
-    const response = await fetch('http://localhost:3003/favourites/5/7', {
-        method: 'DELETE',
+    const response = await fetch('https://restaurants-server-3.onrender.com/favourites/5/1', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
     });
-    console.log(response.json())
+    console.log(await response.json())
 }
 
 addFav();
