@@ -198,7 +198,7 @@ const updateReview = async (req: Request, res: Response) => {
 }
 
 const createBooking = async (req: Request, res: Response) => {
-    const { clientId, cafeId, tableId, date, duration } = req.body;
+    const { clientId, cafeId, tableId, date, duration, guestPhone, guestName, guestAmount } = req.body;
 
     const booking = await prisma.booking.create({
         data: {
@@ -207,6 +207,10 @@ const createBooking = async (req: Request, res: Response) => {
             tableId: Number(tableId),
             date: date as Date,
             duration: Number(duration),
+            guestPhone,
+            guestName,
+            guestAmount: Number(guestAmount),
+
         }
     })
     addUserBonus( +clientId, 5);
