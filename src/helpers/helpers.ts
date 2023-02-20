@@ -207,8 +207,8 @@ const createBooking = async (req: Request, res: Response) => {
             tableId: Number(tableId),
             date: date as Date,
             duration: Number(duration),
-            guestPhone,
-            guestName,
+            guestPhone: String(guestPhone),
+            guestName: String(guestName),
             guestAmount: Number(guestAmount),
 
         }

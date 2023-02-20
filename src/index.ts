@@ -221,7 +221,6 @@ server.get(`/cafe/:id`, async (req, res) => {
         if (cafe) {
             res.json(cafe);
         } else {
-            res.status(404);
             res.json(`{"error":"no such cafe with id ${id}"}`)
         }
     }
