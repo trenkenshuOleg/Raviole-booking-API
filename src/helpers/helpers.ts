@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient, Cafe, Prisma, Review, Client } from '@prisma/client';
-import db from '../db_helpers/restaurants_db';
+import { PrismaClient, Cafe, Review, Client } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -28,8 +27,6 @@ const registerUser = async (req: Request, res: Response) => {
             ]
         }
     });
-    console.log('existing', clients);
-    console.log('req', req.body);
 
     try {
         if (clients.length === 0) {
@@ -45,10 +42,10 @@ const registerUser = async (req: Request, res: Response) => {
             })
             res.json(result)
         } else {
-            res.json('{"error":"login or email is already taken"}')
+            res.json({"error":"login or email is not vacant"})
         }
     }catch(e: unknown) {
-        res.json(`{"error":"provided wrong or no registration data"}`)
+        res.json({"error":"provided wrong or no registration data"})
     }
 }
 
@@ -81,7 +78,7 @@ const loginUser = async (req: Request, res: Response) => {
         if (client.length === 1) {
             res.json(client[0]);
         } else {
-            res.json('{"error":"wrong username or password"}')
+            res.json({"error":"wrong username or password"})
         }
 }
 
@@ -163,6 +160,8 @@ const updateFavourites = async (req: Request, res: Response) => {
             console.log('deleting favourite #', cafeId)
             favouritesIds = favouritesIds.filter(el => el !== Number(cafeId));
             break;
+        default:
+            res.json('{"error":"updateFvourites wrong request method"}')
     }
 
     const addFavourite = await prisma.client.update({
@@ -305,7 +304,7 @@ const createCafe = async (req: Request, res: Response) => {
         })
         res.json(result);
     } else {
-        res.json('{"error":"Already have cafe with this name in this city"}')
+        res.json({"error":"Already have cafe with this name in this city"})
     }
 
   }
@@ -313,7 +312,7 @@ const createCafe = async (req: Request, res: Response) => {
   const getClientById = async (req: Request, res: Response) => {
     const { id } = req.params;
     if (isNaN(Number(id))) {
-        res.json(`{"error":"no such user id ${id} is NaN"}`)
+        res.json({"error":`no such user id ${id} is NaN`})
     } else {
         const client: Client | null = await prisma.client.findUnique({
             where: {
@@ -343,7 +342,7 @@ const createCafe = async (req: Request, res: Response) => {
         if (client) {
             res.json(client);
         } else {
-            res.json(`{"error":"no such user id ${id}"}`)
+            res.json({"error":`no such user id ${id}`})
         }
     }
 
@@ -382,7 +381,7 @@ const editClient = async (req: Request, res: Response) => {
 const getCafeById = async (req: Request, res: Response) => {
     const { id } = req.params;
     if (isNaN(Number(id))) {
-        res.json(`{"error":"no such cafe id ${id} is NaN"}`)
+        res.json({"error":`no such cafe id: ${id} is NaN`})
     } else {
         const cafe: Cafe | null = await prisma.cafe.findUnique({
             where: {
@@ -409,7 +408,7 @@ const getCafeById = async (req: Request, res: Response) => {
         if (cafe) {
             res.json(cafe);
         } else {
-            res.json(`{"error":"no such cafe with id ${id}"}`)
+            res.json({"error":`no such cafe with id ${id}`})
         }
     }
 
@@ -474,7 +473,7 @@ const updateBooking = async (req: Request, res: Response) => {
             res.json(deleted);
             break;
         default :
-        res.json('{"error":"updateBooking wrong request method"}');
+        res.json({"error":"updateBooking wrong request method"});
     }
 
 }
@@ -502,7 +501,7 @@ const getByCity = async (req: Request, res: Response) => {
     if (cafe.length > 0) {
         res.json(cafe);
     } else {
-        res.json(`{"error":"no cafe in this city available: ${city}"}`)
+        res.json({"error":`no cafe in this city available: ${city}`})
     }
 }
 
@@ -555,31 +554,22 @@ const upadatePartial = async (req: Request, res: Response) => {
     res.json(upd)
 }
 
-const uploadDb = async () => {
-    db.forEach(async el => {
-        console.log('creating', el.name, el.city);
-        const result = await prisma.cafe.create({
-            data: {
-                name: el.name,
-                city: el.city,
-                phone: el.phone,
-                coordinates: el.coordinates,
-                averageCheck: el.averageCheck,
-                images: el.images,
-                menuImg: el.menuImg,
-                rating: el.rating,
-                workTimeStart: el.workTimeStart,
-                workTimeEnd: el.workTimeEnd,
-                translation: JSON.stringify(el.translation),
-            },
-            })
-            console.log(result);
-    });
+const selfInvoke = () => {
+    const domain = 'https://restaurants-server-3.onrender.com/'
+    const paths = ['client/', 'cafe/'];
+    const ind = Math.floor(Math.random() * 2)
+    const id = Math.floor(Math.random() * 100) + 1;
+    const url = domain + paths[ind] + id;
+    fetch(url, {
+        method: 'GET'
+    })
+        .then(async (res):Promise<void> => console.log(res.status, url, 'invoked:', Date()))
+        .catch((err: Error) => console.log(err.message))
 
+    setTimeout(selfInvoke, (Math.floor(Math.random() * 30) + 120) * 1000);
 }
 
-
-const loader = {
+export {
     headers,
     registerUser,
     loginUser,
@@ -595,6 +585,5 @@ const loader = {
     getByCity,
     getCafeFiltered,
     upadatePartial,
-    uploadDb
+    selfInvoke
 };
-export default loader;

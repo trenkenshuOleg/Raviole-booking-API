@@ -1,55 +1,33 @@
-import { PrismaClient, Client, Cafe } from '@prisma/client';
 import express = require('express');
-import loader from './helpers/helpers';
-// import db from './Restaurants_db';
 import path = require("path");
+import {headers, selfInvoke} from './helpers';
+import clientRoute from './routes/client';
+import registerRoute from './routes/register';
+import loginRoute from './routes/login';
+import cafeRoute from './routes/cafe';
+import favouritesRoute from './routes/favourites';
+import reviewsRoute from './routes/reviews';
+import bookingsRoute from './routes/bookings';
 
-const prisma = new PrismaClient();
 const server = express();
 
 server.use('/img', express.static(path.join(__dirname, '../img')))
-server.use(loader.headers);
+server.use(headers);
 server.use(express.json());
 
-server.post(`/register`, loader.registerUser);
-server.post('/login', loader.loginUser);
-server.get(`/client/:id`, loader.getClientById);
-server.patch('/client/edit', loader.editClient);
-server.post(`/cafe/new`, loader.createCafe);
-server.get(`/cafe/:id`, loader.getCafeById);
-server.get('/cafe', loader.getCafeFiltered);
-server.get(`/cafe/city/:city`, loader.getByCity);
-server.get('/upd', loader.upadatePartial);
-server.delete('/favourites/:clientId/:cafeId', loader.updateFavourites);
-server.post('/favourites/:clientId/:cafeId', loader.updateFavourites);
-server.post('/reviews', loader.createReview);
-server.patch('/reviews', loader.updateReview);
-server.delete('/reviews/:clientId/:id', loader.updateReview);
-server.post('/bookings', loader.createBooking);
-server.patch('/bookings', loader.updateBooking);
-server.delete('/bookings/:clientId/:id', loader.updateBooking);
-server.get('/uploaddatabase', loader.uploadDb);
+server.use('/register', registerRoute);
+server.use('/login', loginRoute);
+server.use('/client', clientRoute);
+server.use('/cafe', cafeRoute);
+server.use('/favourites', favouritesRoute);
+server.use('/reviews', reviewsRoute);
+server.use('/bookings', bookingsRoute);
+
 
 const port = 3003;
 server.listen(port, () =>
-    console.log(`
-🚀 Server ready at: http://localhost:${port}
-⭐️ Start doing some stuff`),
+    console.log(`Raviole Server is ready at: http://localhost:${port}`),
 )
 
-const selfInvoke = () => {
-    const domain = 'https://restaurants-server-3.onrender.com/'
-    const paths = ['client/', 'cafe/'];
-    const ind = Math.floor(Math.random() * 2)
-    const id = Math.floor(Math.random() * 100) + 1;
-    const url = domain + paths[ind] + id;
-    fetch(url, {
-        method: 'GET'
-    })
-        .then(async (res: Response) => console.log(res.status, url, 'invoked:', Date()))
-        .catch((err: Error) => console.log(err.message))
-
-    setTimeout(selfInvoke, (Math.floor(Math.random() * 30) + 120) * 1000);
-}
-
+// Hack to keep app alive (free hosting issues)
 selfInvoke();
