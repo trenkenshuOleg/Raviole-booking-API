@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "Booking" ADD COLUMN     "guestAmount" INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN     "guestName" TEXT NOT NULL DEFAULT 'Petia',
+ADD COLUMN     "guestPhone" TEXT NOT NULL DEFAULT '112',
+ADD COLUMN     "status" TEXT NOT NULL DEFAULT 'active';
+
+-- AlterTable
+ALTER TABLE "Client" ADD COLUMN     "bonusPoints" INTEGER NOT NULL DEFAULT 25;
+
+-- AlterTable
+ALTER TABLE "Review" ALTER COLUMN "rating" SET DATA TYPE DOUBLE PRECISION;
